@@ -1,0 +1,147 @@
+# -*- coding: utf-8 -*-
+import datetime
+
+###########################################################################################################
+#Defining table for storing notifications
+db.define_table('general_notifications',
+                Field('title'),
+                Field('general_notifications_file','upload'),
+                Field('general_notifications_content','text'))
+#Managing validators for table : general_notifications
+db.general_notifications.title.requires=IS_NOT_EMPTY()
+db.general_notifications.general_notifications_content.requires=IS_NOT_EMPTY()
+############################################################################################################
+
+###############################################################################################################
+#Defining table for storing complaints
+db.define_table('complaint_register',
+                Field('complaint_subject'),
+                Field('complaint_register_file','upload'),
+                Field('complaint_register_content','text'),
+                Field('complaint_register_isresolved','boolean',default=False),
+                Field('complaint_tags'),
+                auth.signature)
+#Managing validators for table : complaint_register
+db.complaint_register.complaint_subject.requires=IS_NOT_EMPTY()
+db.complaint_register.complaint_register_content.requires=IS_NOT_EMPTY()
+####################################################################################################################
+
+####################################################################################################################
+#Defining table for storing discussions in discussion forum
+db.define_table('discussion_forum',
+                Field('discussion_subject'),
+                Field('discussion_content','text',requires=IS_NOT_EMPTY()),
+                Field('discussion_file','upload'),
+                Field('discussion_isanswered','boolean',default=False),
+                Field('discussion_tags'),
+                auth.signature)
+#Managing validators for table : discussion_forum
+db.discussion_forum.discussion_subject.requires=IS_NOT_EMPTY()
+db.discussion_forum.discussion_content.requires=IS_NOT_EMPTY()
+#########################################################################################################################
+
+##########################################################################################################################
+#Defining table for storing comments based on discussion forum
+db.define_table('discussion_comments',
+                Field('comments_id','reference discussion_forum'),
+                Field('comments_content','text'),
+                Field('comments_file','upload'),
+                Field('comments_tags'))
+#Managing validators for table : discussion_comments
+db.discussion_comments.comments_content.requires=IS_NOT_EMPTY()
+##############################################################################################################################
+
+################################################################################################################################
+#Defining table for storing reserved food
+db.define_table('reserve_food',
+                Field('reserve_eating_place'),
+                Field('reserve_caterer'),
+                Field('reserve_date','date'),
+                Field('reserve_meal'),
+                Field('author_id'))
+
+db.reserve_food.reserve_meal.requires=IS_IN_DB(db,'Meal.meal_name')
+db.reserve_food.reserve_eating_place.requires=IS_IN_DB(db,'mess_provider.place_of_mess')
+db.reserve_food.reserve_caterer.requires=IS_IN_DB(db,'mess_provider.caterer_name')
+#################################################################################################################################
+
+#################################################################################################################################
+#Defining table for storing cancelled food
+db.define_table('cancel_food',
+                Field('cancel_eating_place'),
+                Field('cancel_caterer'),
+                Field('cancel_date','datetime'),
+                Field('cancel_meal'),
+                Field('author_id'))
+
+db.cancel_food.cancel_meal.requires=IS_IN_DB(db,'Meal.meal_name')
+db.cancel_food.cancel_eating_place.requires=IS_IN_DB(db,'mess_provider.place_of_mess')
+db.cancel_food.cancel_caterer.requires=IS_IN_DB(db,'mess_provider.caterer_name')
+##################################################################################################################################
+
+###################################################################################################################################
+db.define_table('last_transactions',
+                Field('transaction_type'),
+                Field('transaction_time'),
+                Field('transaction_eating_place'),
+                Field('transaction_caterer'),
+                Field('transaction_start_date','datetime'),
+                Field('transaction_end_date','datetime'),
+                Field('transaction_start_meal'),
+                Field('transaction_end_meal'),
+                auth.signature)
+#Managing validators for table : last_transactions
+db.last_transactions.transaction_type.requires=IS_IN_SET(['Reserve','Cancel'])
+##################################################################################################################################
+
+##################################################################################################################################
+db.define_table('mess_places',
+                Field('place_name'))
+
+db.define_table('mess_provider',
+                Field('caterer_name'),
+                Field('place_of_mess',requires=IS_IN_DB(db,'mess_places.place_name')),
+                Field('email',requires=IS_EMAIL()),
+                Field('account_curr_balance',default=0),
+                Field('phone_number'))
+
+db.mess_provider.account_curr_balance.writable=False
+##################################################################################################################################
+
+######################################################################################################################################
+db.define_table('mess_menu',
+                Field('caterer_name'),
+                Field('place_of_mess'),
+                Field('mess_time'),
+                Field('week_day'),
+                Field('eating_item'))
+#Managing validators for table : mess_menu
+#db.mess_menu.eating_time.requires=IS_TIME(error_message='must be HH:MM:SS!')
+db.mess_menu.caterer_name.requires=IS_IN_DB(db,'mess_provider.caterer_name')
+db.mess_menu.place_of_mess.requires=IS_IN_DB(db,'mess_provider.place_of_mess')
+db.mess_menu.mess_time.requires=IS_IN_DB(db,'Meal.meal_name')
+db.mess_menu.week_day.requires=IS_IN_SET(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+
+db.define_table('meals_timing',
+                Field('mess_place'),
+                Field('mess_time'),
+                Field('eating_time',requires=IS_TIME()),
+                Field('advance_booking'),
+                Field('advance_cancellation'))
+db.meals_timing.mess_place.requires=IS_IN_DB(db,'mess_provider.place_of_mess')
+db.meals_timing.mess_time.requires=IS_IN_DB(db,'Meal.meal_name')
+
+#########################################################################################################################################
+#Types of account
+
+db.define_table('account_type',
+                Field('acc_type'))
+#########################################################################################################################################
+
+########################################################################################################################################
+#Rate of food
+
+db.define_table('Meal',
+                Field('meal_name'),
+                Field('meal_rate'))
+

@@ -1,0 +1,14 @@
+{{extend 'layout.html'}}
+<div class="well">
+	<h1>
+		Mess Admins' Details
+	</h1>
+</div>
+
+<div class="well">
+	{{for i in range(len(row)):}}
+		<h4>
+			 Admin Name : {{=(row[i].auth_user.first_name+' '+row[i].auth_user.last_name)}}  Phone No. : {{=(row[i].user_details.phone_number)}}
+		</h4>
+	{{pass}}
+</div>

@@ -1,0 +1,38 @@
+{{extend 'layout3.html'}}
+
+{{block page_content}}
+{{if len(unread_complaints)>0:}}
+<h3>
+	Unread Complaints
+</h3>
+<ul class>
+	{{for comp in unread_complaints:}}
+		<li>
+			<div class="well">
+				<h4>Subject : {{=comp.complaint_subject}}</h4>
+				<h6>Posted by: {{=(comp.created_by.first_name+' '+comp.created_by.last_name)}} Posted on: {{=(comp.created_on)}}</h6>
+				<h6>{{=comp.complaint_register_content}}</h6>
+			</div>
+		</li>
+	{{pass}}
+</ul>
+
+<div class="well">
+	{{=form_check}}
+</div>
+{{pass}}
+<h3>
+	Read Complaints
+</h3>
+<ul class>
+	{{for comp in read_complaints:}}
+		<li>
+			<div class="well">
+				<h4>Subject : {{=comp.complaint_subject}}</h4>
+				<h6>Posted by: {{=(comp.created_by.first_name+' '+comp.created_by.last_name)}} Posted on: {{=(comp.created_on)}}</h6>				
+				<h6>{{=comp.complaint_register_content}}</h6>
+			</div>
+		</li>
+		{{pass}}
+</ul>
+{{end}}

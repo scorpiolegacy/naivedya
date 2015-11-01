@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Mess Administration Panel</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{=URL("static","css/bootstrap.min.css")}}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{=URL("static","css/sb-admin.css")}}" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="{{=URL("static","css/plugins/morris.css")}}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{{=URL("static","font-awesome/css/font-awesome.min.css")}}" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body class="body_bg">
+
+    <div id="wrapper">
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">Mess Administration Panel</a>
+            </div>
+            <!-- Top Menu Items -->
+            {{if auth.user.account_class=='Super_Admin' or auth.user.account_class=='Admin':}}
+             <ul class="nav navbar-left top-nav">
+                <li class="dropdown">
+                    <a href="{{=URL("appadmin","manage",args=["db_admin"])}}" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-fw fa-gear"></i>Advanced Controls</a>
+                </li>
+             </ul>   
+            {{pass}} 
+            <ul class="nav navbar-right top-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-envelope"></i> <b class="caret"></b></a>
+                    <ul class="dropdown-menu message-dropdown">
+                        {{block block1}}
+                        {{row=db(db.complaint_register.complaint_register_isread==False).select(db.complaint_register.ALL)}}
+                        {{for x in row:}}
+                        <li class="message-preview">
+                            <a href="{{=URL('default_admin','manage_complaints')}}">
+                                <div class="media">
+                                    <div class="media-body">
+                                        <h5 class="media-heading"><strong>{{=x.complaint_subject[0:min(15,len(x.complaint_subject))]}}...</strong>
+                                        </h5>
+                                        <p class="small text-muted"><i class="fa fa-clock-o"></i>{{=(x.created_by.first_name+' '+x.created_by.last_name)+' '+str(x.created_on)}}</p>
+                                        <p>{{=x.complaint_register_content[0:min(40,len(x.complaint_register_content))]}}...</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+{{pass}}
+                        {{end}}
+                        <li class="message-footer">
+                            <a href="{{=URL("default_admin","manage_complaints")}}">Read All New Messages</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{=(auth.user.first_name+' '+auth.user.last_name)}} <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="{{=URL("default","user/profile")}}"><i class="fa fa-fw fa-user"></i> Profile</a>
+                        </li>
+                        <li>
+                            <a href="{{=URL("default","after_login_index")}}"><i class="fa fa-fw fa-user"></i> User Mode</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="{{=URL("default","user/logout")}}"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            {{meals_name=db(db.Meal.id>0).select(db.Meal.ALL)}}
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+                    <li class="active">
+                        <a href="{{=URL("default_admin","index")}}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
+                    </li>
+                    <li>
+                         <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-edit"></i> Set Mess Menu</a>
+                        <ul id="demo" class="collapse">
+                            <li>
+                                <a href="javascript:;" data-toggle="collapse" data-target="#monday">Monday</a>
+                                <ul id="monday" class="collapse">
+                                    {{for meals in meals_name:}}
+                                        <li>
+                                            <a href="{{=URL('default_admin','set_mess_menu',vars={'dayw':'Monday','mealname':meals.meal_name})}}">{{=meals.meal_name}}</a>
+                                        </li>
+                                    {{pass}}
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-toggle="collapse" data-target="#tuesday">Tuesday</a>
+                                <ul id="tuesday" class="collapse">
+                                    {{for meals in meals_name:}}
+                                        <li>
+                                            <a href="{{=URL('default_admin','set_mess_menu',vars={'dayw':'Tuesday','mealname':meals.meal_name})}}">{{=meals.meal_name}}</a>
+                                        </li>
+                                    {{pass}}
+                                </ul>
+                            </li>
+                             <li>
+                                <a href="javascript:;" data-toggle="collapse" data-target="#wednesday">Wednesday</a>
+                                <ul id="wednesday" class="collapse">
+                                    {{for meals in meals_name:}}
+                                        <li>
+                                            <a href="{{=URL('default_admin','set_mess_menu',vars={'dayw':'Wednesday','mealname':meals.meal_name})}}">{{=meals.meal_name}}</a>
+                                        </li>
+                                    {{pass}}
+                                </ul>                            
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-toggle="collapse" data-target="#thursday">Thursday</a>
+                                <ul id="thursday" class="collapse">
+                                    {{for meals in meals_name:}}
+                                        <li>
+                                            <a href="{{=URL('default_admin','set_mess_menu',vars={'dayw':'Thursday','mealname':meals.meal_name})}}">{{=meals.meal_name}}</a>
+                                        </li>
+                                    {{pass}}
+                                </ul>                            
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-toggle="collapse" data-target="#friday">Friday</a>
+                                <ul id="friday" class="collapse">
+                                    {{for meals in meals_name:}}
+                                        <li>
+                                            <a href="{{=URL('default_admin','set_mess_menu',vars={'dayw':'Friday','mealname':meals.meal_name})}}">{{=meals.meal_name}}</a>
+                                        </li>
+                                    {{pass}}
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-toggle="collapse" data-target="#saturday">Saturday</a>
+                                <ul id="saturday" class="collapse">
+                                    {{for meals in meals_name:}}
+                                        <li>
+                                            <a href="{{=URL('default_admin','set_mess_menu',vars={'dayw':'Saturday','mealname':meals.meal_name})}}">{{=meals.meal_name}}</a>
+                                        </li>
+                                    {{pass}}
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-toggle="collapse" data-target="#sunday">Sunday</a>
+                                <ul id="sunday" class="collapse">
+                                    {{for meals in meals_name:}}
+                                        <li>
+                                            <a href="{{=URL('default_admin','set_mess_menu',vars={'dayw':'Sunday','mealname':meals.meal_name})}}">{{=meals.meal_name}}</a>
+                                        </li>
+                                    {{pass}}
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="{{=URL("default_admin","set_account_balance")}}"><i class="fa fa-fw fa-edit"></i>Set Account Balance</a>
+                    </li>
+                    <li>
+                        <a href="{{=URL("default_admin","set_meal_timings")}}"><i class="fa fa-fw fa-edit"></i>Set Meal Timings</a>
+                    </li>
+                    <li>
+                        <a href="{{=URL("default_admin","set_meal_rates")}}"><i class="fa fa-fw fa-edit"></i>Set Meal Rates</a>
+                    </li>
+                    <li>
+                        <a href="{{=URL("default_admin","set_mess_places")}}"><i class="fa fa-fw fa-edit"></i>Set Mess Places</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-toggle="collapse" data-target="#demo1"><i class="fa fa-fw fa-user"></i> Manage People</a>
+                        <ul id="demo1" class="collapse">
+                            <li>
+                                <a href="{{=URL("default_admin","manage_student")}}">Students</a>
+                            </li>
+                            <li>
+                                <a href="{{=URL("default_admin","manage_faculty")}}">Faculty</a>
+                            </li>
+                            <li>
+                                <a href="{{=URL("default_admin","manage_caterer")}}">Mess-Caterers</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+
+        <div id="page-wrapper">
+
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+               {{block page_content}}
+               {{end}}
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="{{=URL("static","js/jquery.js")}}"></script>
+    <script>
+        $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();   
+    });
+    </script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="{{=URL("static","js/raphael.min.js")}}"></script>
+    <script src="{{=URL("static","js/morris.min.js")}}"></script>
+    <script src="{{=URL("static","js/morris-data.js")}}"></script>
+
+    <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
+    <script src="{{=URL('static','js/web2py-bootstrap3.js')}}"></script>
+    {{block page_js}}{{end page_js}}
+    {{if response.google_analytics_id:}}
+    <!-- Analytics ==================================== -->
+    <script src="{{=URL('static','js/analytics.min.js')}}"></script>
+    <script type="text/javascript">
+      analytics.initialize({
+      'Google Analytics':{trackingId:'{{=response.google_analytics_id}}'}
+      });
+    </script>
+    {{pass}}
+
+</body>
+
+</html>

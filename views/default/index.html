@@ -1,0 +1,27 @@
+{{extend 'layout1.html'}}
+<!--
+{{block right_sidebar}}
+{{end}}
+
+
+{{block left_sidebar}}
+<div class="panel panel-info">
+  <div class="panel-heading"><h3 class="panel-title"><a class="btn-block"
+      href="{{=URL('mess_menu_v1','default','index')}}">
+      <i class="glyphicon glyphicon-cog"></i>
+      {{=T("Quick Options")}}
+    </a></h3></div>
+  <div class="panel-body">
+    {{=T("Don't know where to go?")}}
+  </div>
+  <ul class="list-group">
+    <li class="list-group-item">{{=A(T("Today's Menu"), _href=URL('default','index'))}}</li>
+    <li class="list-group-item">{{=A(T("Today's Specials"), _href=URL('default','index'))}}</li>
+    <li class="list-group-item">{{=A(T("Search your favourite food"), _href=URL('default','index'))}}</li>
+  </ul>
+</div>
+{{end}}
+-->
+<div class="well">
+  <h3>Welcome {{=auth.user.first_name}}</h3>
+</div>

@@ -1,0 +1,71 @@
+{{extend 'layout.html'}}
+
+<style>
+      #hi{
+            width: 900px;
+            padding: 25px;
+            border: 13px solid #C0C0C0 ;
+            margin: 25px;
+            text-align: center;
+            margin-top:20px;
+            background-color:#F8F8F8;
+            font-family: "Times New Roman", Georgia, Serif;
+            font-style:italic;
+            font-size:25px;
+        }
+    table{
+        border: AppWorkspace solid 10px;
+        font-size:0.8em;
+        width: 1000px;
+    }
+    table td {border:AppWorkspace solid 5px ; width:100px; word-wrap:break-word;}
+
+</style>
+
+<ul>
+    {{for place in menu_data:}}
+    <li>
+        <h2>
+            {{=place}}
+        </h2>
+        <ul>
+            {{for caterer in menu_data[place]:}} 
+            <li>
+                <h3>
+                {{=caterer}}
+                </h3>
+                <ul>
+                    {{for j in range(len(days)):}}
+                    <li>
+                        <h4>
+                            {{=days[j]}}
+                        <h4>
+                        <ol>
+                            {{for i in range(len(menu_timing)):}}
+                            <li>
+                                <div class="bs-example">
+                                    <table class="table">
+                                        <tr class="active">
+                                            <th>{{=menu_timing[i].meal_name}}</th>
+                                        </tr>
+                                        <tr class="success">
+                                            {{for x in menu_data[place][caterer][j][i]:}}
+                                            <td>
+                                                <h6>{{=x}} </h6>
+                                            </td>
+                                            {{pass}}
+                                        </tr>
+                                    </table>
+                                </div>
+                            </li>
+                            {{pass}}
+                        </ol>
+                    </li>
+                    {{pass}}
+                </ul>
+            </li>
+            {{pass}}
+        </ul>
+    </li>
+    {{pass}}
+</ul>

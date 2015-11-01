@@ -1,0 +1,22 @@
+{{extend 'layout.html'}}
+
+{{if request.vars.modify=='People':}}
+    <div class="well">
+      {{=grid1[0]}}  
+    </div>
+    <div class="well">
+       {{=grid1[1]}} 
+    </div>
+{{elif request.vars.modify=='Caterer':}}
+    {{=grid1}}
+{{elif request.vars.modify=='Mess_Place':}}
+    {{=form1}}
+{{elif request.vars.modify=='Mess_Menu':}}
+    {{=form1}}
+{{elif request.vars.modify=='meals_timing':}}
+    {{=form1}}
+{{elif request.vars.modify=='meal_rate':}}
+    {{=form1}}
+{{else:}}
+    {{=h}}
+{{pass}}

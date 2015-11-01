@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+# try something like
+@auth.requires_login()
+def index():
+	if auth.user.account_class!='Admin':
+		redirect(URL('default','index'))
+	row=db(db.complaint_register.complaint_register_isread==False).select(db.complaint_register.ALL)
+	return locals()
+
+curr_user=''
+curr_user_details=''
+
+def set_account_balance():
+	db.auth_user.id.readable=False
+	db.user_details.account_curr_balance.writable=True
+	db.user_details.account_initial_balance.writable=True
+	query=((db.user_details.id>0) & (db.auth_user.id==db.user_details.user_id))
+	fields=(db.auth_user.first_name,
+		db.auth_user.last_name,
+		db.auth_user.email,
+		db.user_details.account_curr_balance)
+	headers={
+		'auth_user.first_name':"First Name",
+		'auth_user.last_name':"Last Name",
+		'auth_user.email':"Email",
+		'user_details.account_curr_balance':"Current Balance"}
+
+	grid1=SQLFORM.grid(
+		query=query, 
+		fields=fields, 
+		headers=headers, 
+		create=False, 
+		deletable=False, 
+		editable=True) 
+
+	if request.args(0)=='edit':
+		curr_user=db(db.auth_user.id==int(request.args(2))).select(db.auth_user.ALL)
+		curr_user_details=db(db.user_details.user_id==int(request.args(2))).select(db.user_details.ALL)
+		redirect(URL('default_admin','set_account_balance/viewedit'))
+	elif request.args(0)=='viewedit':
+		if curr_user!='' or curr_user_details!='':
+			redirect(URL('default_admin','set_account_balance'))
+		form_bal=SQLFORM.factory(Field('account_bal'))
+		if form_bal.process().accepted:
+			db(db.user_details.user_id==int(request.args(2))).update(account_curr_balance=form_bal.vars.account_bal)
+			redirect(URL('default_admin','set_account_balance'))
+			curr_user=''
+			curr_user_details=''
+		elif form_bal.errors:
+			response.flash="Enter valid value"
+		else:
+			response.flash="Update Account Balance"
+
+	#elif request.args(0)=='viewview' and curr_user_details!='' and curr_user!='':
+	else:
+		redirect(URL('default_admin','set_account_balance'))
+		curr_user=''
+		curr_user_details=''
+
+	if form_bal:
+		return dict(form_bal=form_bal,curr_user_details=curr_user_details,curr_user=curr_user,grid1=grid1)
+	else:
+		return dict(curr_user_details=curr_user_details,curr_user=curr_user,grid1=grid1)
+
+def set_meal_timings():
+	return locals()
+
+def set_advbc_timings():
+	return locals()
+
+def set_meal_rates():
+	return locals()
+
+def set_mess_places():
+	return locals()
+
+def manage_people():
+	return locals()

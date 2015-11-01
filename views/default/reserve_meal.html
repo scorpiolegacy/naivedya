@@ -1,0 +1,17 @@
+{{extend 'layout.html'}}
+{{response.files.append(URL(r=request,c='static',f='js/ui.core.js'))}}
+{{response.files.append(URL(r=request,c='static',f='js/ui.draggable.js'))}}
+{{response.files.append(URL(r=request,c='static',f='js/ui.resizable.js'))}}
+{{response.files.append(URL(r=request,c='static',f='js/fullcalendar.min.js'))}}
+{{response.files.append(URL(r=request,c='static',f='css/fullcalendar.css'))}}
+
+<div id='calendar'></div>
+<div class="well">
+	<h1>
+		Food Booking Form
+	</h1>
+</div>
+
+<div class="well">
+	{{=form1}}
+</div>

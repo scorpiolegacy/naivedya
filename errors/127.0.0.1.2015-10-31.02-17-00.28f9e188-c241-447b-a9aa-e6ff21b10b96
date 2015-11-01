@@ -1,0 +1,340 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.AttributeError'> "
+p3
+sS'layer'
+p4
+S'/home/scorpio/web2py/applications/mess_menu_v1/views/default_admin/index.html'
+p5
+sS'code'
+p6
+S'response.write(\'<!DOCTYPE html>\\n<html lang="en">\\n\\n<head>\\n\\n    <meta charset="utf-8">\\n    <meta http-equiv="X-UA-Compatible" content="IE=edge">\\n    <meta name="viewport" content="width=device-width, initial-scale=1">\\n    <meta name="description" content="">\\n    <meta name="author" content="">\\n\\n    <title>Mess Administration Panel</title>\\n\\n    <!-- Bootstrap Core CSS -->\\n    <link href="\', escape=False)\nresponse.write(URL("static","css/bootstrap.min.css"))\nresponse.write(\'" rel="stylesheet">\\n\\n    <!-- Custom CSS -->\\n    <link href="\', escape=False)\nresponse.write(URL("static","css/sb-admin.css"))\nresponse.write(\'" rel="stylesheet">\\n\\n    <!-- Morris Charts CSS -->\\n    <link href="\', escape=False)\nresponse.write(URL("static","css/plugins/morris.css"))\nresponse.write(\'" rel="stylesheet">\\n\\n    <!-- Custom Fonts -->\\n    <link href="\', escape=False)\nresponse.write(URL("static","font-awesome/css/font-awesome.min.css"))\nresponse.write(\'" rel="stylesheet" type="text/css">\\n\\n    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->\\n    <!-- WARNING: Respond.js doesn\\\'t work if you view the page via file:// -->\\n    <!--[if lt IE 9]>\\n        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>\\n        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>\\n    <![endif]-->\\n\\n</head>\\n\\n<body class="body_bg">\\n\\n    <div id="wrapper">\\n        <!-- Navigation -->\\n        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">\\n            <!-- Brand and toggle get grouped for better mobile display -->\\n            <div class="navbar-header">\\n                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">\\n                    <span class="sr-only">Toggle navigation</span>\\n                    <span class="icon-bar"></span>\\n                    <span class="icon-bar"></span>\\n                    <span class="icon-bar"></span>\\n                </button>\\n                <a class="navbar-brand" href="index.html">Mess Administration Panel</a>\\n            </div>\\n            <!-- Top Menu Items -->\\n            \', escape=False)\nif auth.user.account_class==\'Super_Admin\' or auth.user.account_class==\'Admin\':\n    response.write(\'\\n             <ul class="nav navbar-left top-nav">\\n                <li class="dropdown">\\n                    <a href="\', escape=False)\n    response.write(URL("appadmin","manage",args=["db_admin"]))\n    response.write(\'" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-fw fa-gear"></i>Advanced Controls</a>\\n                </li>\\n             </ul>   \\n            \', escape=False)\n    pass\nresponse.write(\' \\n            <ul class="nav navbar-right top-nav">\\n                <li class="dropdown">\\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-envelope"></i> <b class="caret"></b></a>\\n                    <ul class="dropdown-menu message-dropdown">\\n                        \', escape=False)\nresponse.write(\'\\n\', escape=False)\nfor x in row:\n    response.write(\'\\n\\t <li class="message-preview">\\n                            <a href="#">\\n                                <div class="media">\\n                                    <div class="media-body">\\n                                        <h5 class="media-heading"><strong>\', escape=False)\n    response.write(x.complaint_subject[0:min(15,len(x.complaint_subject))])\n    response.write(\'...</strong>\\n                                        </h5>\\n                                        <p class="small text-muted"><i class="fa fa-clock-o"></i>\', escape=False)\n    response.write((x.created_by.first_name+\' \'+x.created_by.last_name)+\' \'+str(x.created_on))\n    response.write(\'</p>\\n                                        <p>\', escape=False)\n    response.write(x.complaint_register_content[0:min(40,len(x.complaint_register_content))])\n    response.write(\'...</p>\\n                                    </div>\\n                                </div>\\n                            </a>\\n                        </li>\\n\', escape=False)\n    pass\nresponse.write(\'\\n\', escape=False)\nresponse.write(\'\\n                        <li class="message-footer">\\n                            <a href="#">Read All New Messages</a>\\n                        </li>\\n                    </ul>\\n                </li>\\n                <li class="dropdown">\\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> \', escape=False)\nresponse.write((auth.user.first_name+\' \'+auth.user.last_name))\nresponse.write(\' <b class="caret"></b></a>\\n                    <ul class="dropdown-menu">\\n                        <li>\\n                            <a href="\', escape=False)\nresponse.write(URL("default","user/profile"))\nresponse.write(\'"><i class="fa fa-fw fa-user"></i> Profile</a>\\n                        </li>\\n                        <li>\\n                            <a href="\', escape=False)\nresponse.write(URL("default","after_login_index"))\nresponse.write(\'"><i class="fa fa-fw fa-user"></i> User Mode</a>\\n                        </li>\\n                        <li class="divider"></li>\\n                        <li>\\n                            <a href="\', escape=False)\nresponse.write(URL("default","user/logout"))\nresponse.write(\'"><i class="fa fa-fw fa-power-off"></i> Log Out</a>\\n                        </li>\\n                    </ul>\\n                </li>\\n            </ul>\\n\\n            \', escape=False)\nmeals_name=db.Meal(db.Meal.id>0).select(db.Meal.ALL)\nresponse.write(\'\\n            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->\\n            <div class="collapse navbar-collapse navbar-ex1-collapse">\\n                <ul class="nav navbar-nav side-nav">\\n                    <li class="active">\\n                        <a href="\', escape=False)\nresponse.write(URL("default_admin","index"))\nresponse.write(\'"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>\\n                    </li>\\n                    <li>\\n                         <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-edit"></i> Set Mess Menu</a>\\n                        <ul id="demo" class="collapse">\\n                            <li>\\n                                <a href="javascript:;" data-toggle="collapse" data-target="#monday">Monday</a>\\n                                <ul id="monday" class="collapse">\\n                                    \', escape=False)\nfor meals in meals_name:\n    response.write(\'\\n                                        <li>\\n                                            <a href="#">\', escape=False)\n    response.write(meals)\n    response.write(\'</a>\\n                                        </li>\\n                                    \', escape=False)\n    pass\nresponse.write(\'\\n                                </ul>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin",""))\nresponse.write(\'">Tuesday</a>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","index"))\nresponse.write(\'">Tuesday</a>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","index"))\nresponse.write(\'">Wednesday</a>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","index"))\nresponse.write(\'">Thursday</a>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","index"))\nresponse.write(\'">Friday</a>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","index"))\nresponse.write(\'">Saturday</a>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","index"))\nresponse.write(\'">Sunday</a>\\n                            </li>\\n                        </ul>\\n                    </li>\\n                    <li>\\n                        <a href="\', escape=False)\nresponse.write(URL("default_admin","set_account_balance"))\nresponse.write(\'"><i class="fa fa-fw fa-edit"></i>Set Account Balance</a>\\n                    </li>\\n                    <li>\\n                        <a href="\', escape=False)\nresponse.write(URL("default_admin","set_meal_timings"))\nresponse.write(\'"><i class="fa fa-fw fa-edit"></i>Set Meal Timings</a>\\n                    </li>\\n                    <li>\\n                        <a href="\', escape=False)\nresponse.write(URL("default_admin","set_meal_rates"))\nresponse.write(\'"><i class="fa fa-fw fa-edit"></i>Set Meal Rates</a>\\n                    </li>\\n                    <li>\\n                        <a href="\', escape=False)\nresponse.write(URL("default_admin","set_mess_places"))\nresponse.write(\'"><i class="fa fa-fw fa-edit"></i>Set Mess Places</a>\\n                    </li>\\n                    <li>\\n                        <a href="javascript:;" data-toggle="collapse" data-target="#demo1"><i class="fa fa-fw fa-user"></i> Manage People</a>\\n                        <ul id="demo1" class="collapse">\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","manage_student"))\nresponse.write(\'">Students</a>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","manage_faculty"))\nresponse.write(\'">Faculty</a>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","manage_committee"))\nresponse.write(\'">Mess-Committee Members</a>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)\nresponse.write(URL("default_admin","manage_caterer"))\nresponse.write(\'">Mess-Caterers</a>\\n                            </li>\\n                        </ul>\\n                    </li>\\n                </ul>\\n            </div>\\n            <!-- /.navbar-collapse -->\\n        </nav>\\n\\n        <div id="page-wrapper">\\n\\n            <div class="container-fluid">\\n\\n                <!-- Page Heading -->\\n               \', escape=False)\nresponse.write(\'\\n <div class="row">\\n                    <div class="col-lg-12">\\n                        <h1 class="page-header">\\n                            Dashboard <small>Statistics Overview</small>\\n                        </h1>\\n                        <ol class="breadcrumb">\\n                            <li class="active">\\n                                <i class="fa fa-dashboard"></i> Dashboard\\n                            </li>\\n                        </ol>\\n                    </div>\\n                </div>\\n                <!-- /.row -->\\n\\n                <div class="row">\\n                    <div class="col-lg-3 col-md-6">\\n                        <div class="panel panel-red">\\n                            <div class="panel-heading">\\n                                <div class="row">\\n                                    <div class="col-xs-3">\\n                                        <i class="fa fa-comments fa-5x"></i>\\n                                    </div>\\n                                    <div class="col-xs-9 text-right">\\n                                        <div class="huge">26</div>\\n                                        <div>Unread Complaints</div>\\n                                    </div>\\n                                </div>\\n                            </div>\\n                            <a href="#">\\n                                <div class="panel-footer">\\n                                    <span class="pull-left">View Details</span>\\n                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>\\n                                    <div class="clearfix"></div>\\n                                </div>\\n                            </a>\\n                        </div>\\n                    </div>\\n                    <div class="col-lg-3 col-md-6">\\n                        <div class="panel panel-green">\\n                            <div class="panel-heading">\\n                                <div class="row">\\n                                    <div class="col-xs-3">\\n                                        <i class="fa fa-tasks fa-5x"></i>\\n                                    </div>\\n                                    <div class="col-xs-9 text-right">\\n                                        <div class="huge">12</div>\\n                                        <div>Tasks to be Completed</div>\\n                                    </div>\\n                                </div>\\n                            </div>\\n                            <a href="#">\\n                                <div class="panel-footer">\\n                                    <span class="pull-left">View Details</span>\\n                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>\\n                                    <div class="clearfix"></div>\\n                                </div>\\n                            </a>\\n                        </div>\\n                    </div>\\n                    <div class="col-lg-3 col-md-6">\\n                        <div class="panel panel-primary">\\n                            <div class="panel-heading">\\n                                <div class="row">\\n                                    <div class="col-xs-3">\\n                                        <i class="fa fa-support fa-5x"></i>\\n                                    </div>\\n                                    <div class="col-xs-9 text-right">\\n                                        <div class="huge">13</div>\\n                                        <div>Requests for Registration Approvals</div>\\n                                    </div>\\n                                </div>\\n                            </div>\\n                            <a href="#">\\n                                <div class="panel-footer">\\n                                    <span class="pull-left">View Details</span>\\n                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>\\n                                    <div class="clearfix"></div>\\n                                </div>\\n                            </a>\\n                        </div>\\n                    </div>\\n                </div>\\n                <!-- /.row -->\\n\', escape=False)\nresponse.write(\'\\n\\n            </div>\\n            <!-- /.container-fluid -->\\n\\n        </div>\\n        <!-- /#page-wrapper -->\\n\\n    </div>\\n    <!-- /#wrapper -->\\n\\n    <!-- jQuery -->\\n    <script src="\', escape=False)\nresponse.write(URL("static","js/jquery.js"))\nresponse.write(\'"></script>\\n\\n    <!-- Morris Charts JavaScript -->\\n    <script src="\', escape=False)\nresponse.write(URL("static","js/raphael.min.js"))\nresponse.write(\'"></script>\\n    <script src="\', escape=False)\nresponse.write(URL("static","js/morris.min.js"))\nresponse.write(\'"></script>\\n    <script src="\', escape=False)\nresponse.write(URL("static","js/morris-data.js"))\nresponse.write(\'"></script>\\n\\n    <script src="\', escape=False)\nresponse.write(URL(\'static\',\'js/bootstrap.min.js\'))\nresponse.write(\'"></script>\\n    <script src="\', escape=False)\nresponse.write(URL(\'static\',\'js/web2py-bootstrap3.js\'))\nresponse.write(\'"></script>\\n    \', escape=False)\nresponse.write(\'\\n    \', escape=False)\nif response.google_analytics_id:\n    response.write(\'\\n    <!-- Analytics ==================================== -->\\n    <script src="\', escape=False)\n    response.write(URL(\'static\',\'js/analytics.min.js\'))\n    response.write(\'"></script>\\n    <script type="text/javascript">\\n      analytics.initialize({\\n      \\\'Google Analytics\\\':{trackingId:\\\'\', escape=False)\n    response.write(response.google_analytics_id)\n    response.write("\'}\\n      });\\n    </script>\\n    ", escape=False)\n    pass\nresponse.write(\'\\n\\n</body>\\n\\n</html>\\n\', escape=False)'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__hash__'
+p12
+S"<method-wrapper '__hash__' of exceptions.AttributeError object>"
+p13
+sS'__setattr__'
+p14
+S"<method-wrapper '__setattr__' of exceptions.AttributeError object>"
+p15
+sS'__reduce_ex__'
+p16
+S'<built-in method __reduce_ex__ of exceptions.AttributeError object>'
+p17
+sS'__getslice__'
+p18
+S"<method-wrapper '__getslice__' of exceptions.AttributeError object>"
+p19
+sS'__getitem__'
+p20
+S"<method-wrapper '__getitem__' of exceptions.AttributeError object>"
+p21
+sS'__setstate__'
+p22
+S'<built-in method __setstate__ of exceptions.AttributeError object>'
+p23
+sS'__reduce__'
+p24
+S'<built-in method __reduce__ of exceptions.AttributeError object>'
+p25
+sS'__str__'
+p26
+S"<method-wrapper '__str__' of exceptions.AttributeError object>"
+p27
+sS'__format__'
+p28
+S'<built-in method __format__ of exceptions.AttributeError object>'
+p29
+sS'__getattribute__'
+p30
+S"<method-wrapper '__getattribute__' of exceptions.AttributeError object>"
+p31
+sS'__class__'
+p32
+S"<type 'exceptions.AttributeError'>"
+p33
+sS'__unicode__'
+p34
+S'<built-in method __unicode__ of exceptions.AttributeError object>'
+p35
+sS'__delattr__'
+p36
+S"<method-wrapper '__delattr__' of exceptions.AttributeError object>"
+p37
+sS'__subclasshook__'
+p38
+S'<built-in method __subclasshook__ of type object>'
+p39
+sS'__repr__'
+p40
+S"<method-wrapper '__repr__' of exceptions.AttributeError object>"
+p41
+sS'args'
+p42
+S'()'
+p43
+sS'__dict__'
+p44
+S'{}'
+p45
+sS'__sizeof__'
+p46
+S'<built-in method __sizeof__ of exceptions.AttributeError object>'
+p47
+sS'__doc__'
+p48
+S"'Attribute not found.'"
+p49
+sS'__init__'
+p50
+S"<method-wrapper '__init__' of exceptions.AttributeError object>"
+p51
+sS'__new__'
+p52
+S'<built-in method __new__ of type object>'
+p53
+ssS'evalue'
+p54
+S''
+sS'request'
+p55
+cgluon.html
+XML_unpickle
+p56
+(S's\x92[\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">ajax</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">application</td><td style="vertical-align:top;">:</td><td><div>mess_menu_v1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cid</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">client</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">controller</td><td style="vertical-align:top;">:</td><td><div>default_admin</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_admin</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-5e64408c-b742-47ff-b897-c051eea97465<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_mess_menu_v1</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-a65671da-9c07-461f-825b-94b836e5af0c<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_welcome</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-7e7b23d8-fa84-4735-b8ec-ffe07a29f73f<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">env</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT</td><td style="vertical-align:top;">:</td><td><div>text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_ENCODING</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_LANGUAGE</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.5</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CACHE_CONTROL</td><td style="vertical-align:top;">:</td><td><div>max-age=0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONNECTION</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_COOKIE</td><td style="vertical-align:top;">:</td><td><div>session_id_welcome=127.0.0.1-7e7b23d8-fa84-4735-b8ec-ffe07a29f73f; session_id_admin=127.0.0.1-5e64408c-b742-47ff-b897-c051eea97465; session_id_mess_menu_v1=127.0.0.1-a65671da-9c07-461f-825b-94b836e5af0c</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_HOST</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_REFERER</td><td style="vertical-align:top;">:</td><td><div>http://127.0.0.1:8000/mess_menu_v1/default_admin/set_mess_places</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_USER_AGENT</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:41.0) Gecko/20100101 Firefox/41.0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">PATH_INFO</td><td style="vertical-align:top;">:</td><td><div>/mess_menu_v1/default_admin/index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">QUERY_STRING</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_ADDR</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_PORT</td><td style="vertical-align:top;">:</td><td><div>50762</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_METHOD</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SCRIPT_NAME</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_NAME</td><td style="vertical-align:top;">:</td><td><div>scorpio</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PORT</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PROTOCOL</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_SOFTWARE</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/scorpio/web2py/applications/welcome/&#x27;, &#x27;/home/scorpio/web2py/applications/mess_menu_v1/&#x27;, &#x27;/home/scorpio/web2py/applications/admin/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0xb5bf6c6c: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;127.0.0.1&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;ips&#x27;: [&#x27;127.0.1.1&#x27;], &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;scheduler_groups&#x27;: None, &#x27;port&#x27;: 8000, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;scorpio&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;print_errors&#x27;: False, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;/home/scorpio/web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;&lt;ask&gt;&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept</td><td style="vertical-align:top;">:</td><td><div>text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_encoding</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_language</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.5</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cache_control</td><td style="vertical-align:top;">:</td><td><div>max-age=0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_connection</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cookie</td><td style="vertical-align:top;">:</td><td><div>session_id_welcome=127.0.0.1-7e7b23d8-fa84-4735-b8ec-ffe07a29f73f; session_id_admin=127.0.0.1-5e64408c-b742-47ff-b897-c051eea97465; session_id_mess_menu_v1=127.0.0.1-a65671da-9c07-461f-825b-94b836e5af0c</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_host</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_referer</td><td style="vertical-align:top;">:</td><td><div>http://127.0.0.1:8000/mess_menu_v1/default_admin/set_mess_places</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_user_agent</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:41.0) Gecko/20100101 Firefox/41.0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>scorpio</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path_info</td><td style="vertical-align:top;">:</td><td><div>/mess_menu_v1/default_admin/index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">query_string</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_addr</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_port</td><td style="vertical-align:top;">:</td><td><div>50762</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_method</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_uri</td><td style="vertical-align:top;">:</td><td><div>/mess_menu_v1/default_admin/index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">script_name</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_name</td><td style="vertical-align:top;">:</td><td><div>scorpio</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_port</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_protocol</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_software</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_path</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.12.3-stable+timestamp.2015.08.19.00.18.03</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0xb75690d0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0xb69b002c&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0xb3dcce2c&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0xb75690d0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0xb69b002c&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0xb3dcce2c&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">extension</td><td style="vertical-align:top;">:</td><td><div>html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">folder</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py/applications/mess_menu_v1/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">function</td><td style="vertical-align:top;">:</td><td><div>index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">global_settings</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/scorpio/web2py/applications/welcome/&#x27;, &#x27;/home/scorpio/web2py/applications/mess_menu_v1/&#x27;, &#x27;/home/scorpio/web2py/applications/admin/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0xb5bf6c6c: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;127.0.0.1&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;ips&#x27;: [&#x27;127.0.1.1&#x27;], &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;scheduler_groups&#x27;: None, &#x27;port&#x27;: 8000, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;scorpio&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;print_errors&#x27;: False, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;/home/scorpio/web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;&lt;ask&gt;&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>scorpio</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.12.3-stable+timestamp.2015.08.19.00.18.03</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_https</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_local</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_restful</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_sheduler</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_shell</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">now</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2015, 10, 31, 2, 17, 0, 973548)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_args</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_extension</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">url</td><td style="vertical-align:top;">:</td><td><div>/mess_menu_v1/default_admin/index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">utcnow</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2015, 10, 30, 20, 47, 0, 973593)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi</td><td style="vertical-align:top;">:</td><td><div>&lt;gluon.main.LazyWSGI object at 0xad0c9d0c&gt;</div></td></tr></table></div>'
+tRp57
+sS'frames'
+p58
+(lp59
+(dp60
+S'file'
+p61
+S'/home/scorpio/web2py/gluon/restricted.py'
+p62
+sS'dump'
+p63
+(dp64
+S'environment'
+p65
+S"{'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'ASSIGNJS': <function ASSIGNJS>, 'AppConfig': <function AppConfig>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, ...}"
+p66
+sS'ccode'
+p67
+S'<code object <module> at 0xadc55d10, file "/home..._menu_v1/views/default_admin/index.html", line 1>'
+p68
+ssS'lnum'
+p69
+I227
+sS'lines'
+p70
+(dp71
+I224
+S'            ccode = code'
+p72
+sI225
+S'        else:'
+p73
+sI226
+S'            ccode = compile2(code, layer)'
+p74
+sI227
+S'        exec ccode in environment'
+p75
+sI228
+S'    except HTTP:'
+p76
+sI229
+S'        raise'
+p77
+sI230
+S'    except RestrictedError:'
+p78
+sI231
+S'        # do not encapsulate (obfuscate) the original RestrictedError'
+p79
+sI222
+S'    try:'
+p80
+sI223
+S'        if isinstance(code, types.CodeType):'
+p81
+ssS'call'
+p82
+S'(code=\'response.write(\\\'<!DOCTYPE html>\\\\n<html lang="en"...e.write(\\\'\\\\n\\\\n</body>\\\\n\\\\n</html>\\\\n\\\', escape=False)\', environment={\'A\': <class \'gluon.html.A\'>, \'ANY_OF\': <class \'gluon.validators.ANY_OF\'>, \'ASSIGNJS\': <function ASSIGNJS>, \'AppConfig\': <function AppConfig>, \'Auth\': <class \'gluon.tools.Auth\'>, \'B\': <class \'gluon.html.B\'>, \'BEAUTIFY\': <class \'gluon.html.BEAUTIFY\'>, \'BODY\': <class \'gluon.html.BODY\'>, \'BR\': <class \'gluon.html.BR\'>, \'BUTTON\': <class \'gluon.html.BUTTON\'>, ...}, layer=\'/home/scorpio/web2py/applications/mess_menu_v1/views/default_admin/index.html\')'
+p83
+sS'func'
+p84
+S'restricted'
+p85
+sa(dp86
+g61
+S'/home/scorpio/web2py/applications/mess_menu_v1/views/default_admin/index.html'
+p87
+sg63
+(dp88
+S'div'
+p89
+S'undefined'
+p90
+ssg69
+I36
+sg70
+(dp91
+I32
+S'response.write(URL("default","after_login_index"))'
+p92
+sI33
+S'response.write(\'"><i class="fa fa-fw fa-user"></i> User Mode</a>\\n                        </li>\\n                        <li class="divider"></li>\\n                        <li>\\n                            <a href="\', escape=False)'
+p93
+sI34
+S'response.write(URL("default","user/logout"))'
+p94
+sI35
+S'response.write(\'"><i class="fa fa-fw fa-power-off"></i> Log Out</a>\\n                        </li>\\n                    </ul>\\n                </li>\\n            </ul>\\n\\n            \', escape=False)'
+p95
+sI36
+S'meals_name=db.Meal(db.Meal.id>0).select(db.Meal.ALL)'
+p96
+sI37
+S'response.write(\'\\n            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->\\n            <div class="collapse navbar-collapse navbar-ex1-collapse">\\n                <ul class="nav navbar-nav side-nav">\\n                    <li class="active">\\n                        <a href="\', escape=False)'
+p97
+sI38
+S'response.write(URL("default_admin","index"))'
+p98
+sI39
+S'response.write(\'"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>\\n                    </li>\\n                    <li>\\n                         <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-edit"></i> Set Mess Menu</a>\\n                        <ul id="demo" class="collapse">\\n                            <li>\\n                                <a href="javascript:;" data-toggle="collapse" data-target="#monday">Monday</a>\\n                                <ul id="monday" class="collapse">\\n                                    \', escape=False)'
+p99
+sI40
+S'for meals in meals_name:'
+p100
+sI41
+S'    response.write(\'\\n                                        <li>\\n                                            <a href="#">\', escape=False)'
+p101
+sI42
+S'    response.write(meals)'
+p102
+sI43
+S"    response.write('</a>\\n                                        </li>\\n                                    ', escape=False)"
+p103
+sI44
+S'    pass'
+p104
+sI45
+S'response.write(\'\\n                                </ul>\\n                            </li>\\n                            <li>\\n                                <a href="\', escape=False)'
+p105
+sI46
+S'response.write(URL("default_admin",""))'
+p106
+sI27
+S'response.write(\'\\n                        <li class="message-footer">\\n                            <a href="#">Read All New Messages</a>\\n                        </li>\\n                    </ul>\\n                </li>\\n                <li class="dropdown">\\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> \', escape=False)'
+p107
+sI28
+S"response.write((auth.user.first_name+' '+auth.user.last_name))"
+p108
+sI29
+S'response.write(\' <b class="caret"></b></a>\\n                    <ul class="dropdown-menu">\\n                        <li>\\n                            <a href="\', escape=False)'
+p109
+sI30
+S'response.write(URL("default","user/profile"))'
+p110
+sI31
+S'response.write(\'"><i class="fa fa-fw fa-user"></i> Profile</a>\\n                        </li>\\n                        <li>\\n                            <a href="\', escape=False)'
+p111
+ssg82
+S'()'
+p112
+sg84
+S'<module>'
+p113
+sa(dp114
+g61
+S'/home/scorpio/web2py/gluon/packages/dal/pydal/objects.py'
+p115
+sg63
+(dp116
+S'builtinAttributeError'
+p117
+S"<type 'exceptions.AttributeError'>"
+p118
+ssg69
+I90
+sg70
+(dp119
+I85
+S''
+sI86
+S'    def __getattr__(self, k):'
+p120
+sI87
+S'        try:'
+p121
+sI88
+S'            return self.__getitem__(k)'
+p122
+sI89
+S'        except KeyError:'
+p123
+sI90
+S'            raise AttributeError'
+p124
+sI91
+S''
+sI92
+S'    def __copy__(self):'
+p125
+sI93
+S'        return Row(self)'
+p126
+sI94
+S''
+ssg82
+S"(self=<Row {'meal_rate': '30', 'meal_name': 'Breakfast', 'id': 1L}>, k='select')"
+p127
+sg84
+S'__getattr__'
+p128
+sasS'pyver'
+p129
+S'Python 2.7.6: /usr/bin/python (prefix: /usr)'
+p130
+sS'session'
+p131
+g56
+(S's\x8d\n\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">auth</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">expiration</td><td style="vertical-align:top;">:</td><td><div>3600</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">hmac_key</td><td style="vertical-align:top;">:</td><td><div>aa20d4f2-62b0-4364-a06e-035d36382df4</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_visit</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2015, 10, 31, 2, 17, 0, 973548)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remember_me</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">account_class</td><td style="vertical-align:top;">:</td><td><div>Admin</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">email</td><td style="vertical-align:top;">:</td><td><div>upendra.k14@iiits.in</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">first_name</td><td style="vertical-align:top;">:</td><td><div>Upendra</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">id</td><td style="vertical-align:top;">:</td><td><div>12L</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_name</td><td style="vertical-align:top;">:</td><td><div>Kumar</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">profile_set</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_id</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">reset_password_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">roll_no</td><td style="vertical-align:top;">:</td><td><div>IS201401048</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user_groups</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">66</td><td style="vertical-align:top;">:</td><td><div>user_12</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr></table></div>'
+tRp132
+sS'etype'
+p133
+S"<type 'exceptions.AttributeError'>"
+p134
+sS'date'
+p135
+S'Sat Oct 31 02:17:01 2015'
+p136
+sS'response'
+p137
+g56
+(S's\xb81\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">body</td><td style="vertical-align:top;">:</td><td><div>&lt;cStringIO.StringO object at 0xad0c9020&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">caterer</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div><table><tr><td><div>Number of people</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/caterer_people</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_mess_menu_v1</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-a65671da-9c07-461f-825b-94b836e5af0c<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div>/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">delimiters</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>{{</div></td></tr><tr><td><div>}}</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">files</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">form_label_separator</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">formstyle</td><td style="vertical-align:top;">:</td><td><div>bootstrap3_inline</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generic_patterns</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>*</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">google_analytics_id</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">headers</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">X-Powered-By</td><td style="vertical-align:top;">:</td><td><div>web2py</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">logo</td><td style="vertical-align:top;">:</td><td><div><a href="http://www.iiits.ac.in/" id="web2py-logo"><img height="55px" src="/mess_menu_v1/static/images/iiits_logo.jpg" /></a></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">managing_admin</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div><table><tr><td><div>Add/Change/Remove</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>People</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/admin_change_remove.html?modify=People</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Caterer</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/admin_change_remove.html?modify=Caterer</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Mess Place</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/admin_change_remove.html?modify=Mess_Place</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Issue Notifications</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Approve Registration</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Student</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Faculty</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Staff Members</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Mess Committee Member</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Caterer</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Change Mess Menu</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">menu</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div><table><tr><td><div>Home</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Menu Details</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_menu</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Reserve/Cancel Meal</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/reserve_cancel</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Reserve Meal</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/reserve_meal</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Cancel Meal</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/cancel_meal</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>People</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_people</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Mess-Incharge</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_incharge</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Mess-Committee Members</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_commitee</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Caterers</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_caterer</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Switch to Admin Mode</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default_admin/index</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">meta</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">author</td><td style="vertical-align:top;">:</td><td><div>Your Name &lt;you@example.com&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">description</td><td style="vertical-align:top;">:</td><td><div>a cool new app</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generator</td><td style="vertical-align:top;">:</td><td><div>Web2py Web Framework</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">keywords</td><td style="vertical-align:top;">:</td><td><div>web2py, python, framework</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">models_to_run</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>^\\w+\\.py$</div></td></tr><tr><td><div>^default_admin/\\w+\\.py$</div></td></tr><tr><td><div>^default_admin/index/\\w+\\.py$</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">postprocessing</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_client</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_compression_level</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_expires</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_key</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_data_name</td><td style="vertical-align:top;">:</td><td><div>session_data_mess_menu_v1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_file</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;/home/scorpio/web2py/applications/mess_menu_v1/sessions/0e1/048/127.0.0.1-a65671da-9c07-461f-825b-94b836e5af0c&#x27;, mode &#x27;rb+&#x27; at 0xac19abd0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_filename</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py/applications/mess_menu_v1/sessions/127.0.0.1-a65671da-9c07-461f-825b-94b836e5af0c</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_hash</td><td style="vertical-align:top;">:</td><td><div>58455225b8efcdf8dbd82bb1a9527962</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-a65671da-9c07-461f-825b-94b836e5af0c</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_name</td><td style="vertical-align:top;">:</td><td><div>session_id_mess_menu_v1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_locked</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_masterapp</td><td style="vertical-align:top;">:</td><td><div>mess_menu_v1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_new</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_storage_type</td><td style="vertical-align:top;">:</td><td><div>file</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">status</td><td style="vertical-align:top;">:</td><td><div>200</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">subtitle</td><td style="vertical-align:top;">:</td><td><div>Welcome to Mess Portal</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">title</td><td style="vertical-align:top;">:</td><td><div>Feeling hungry?</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">view</td><td style="vertical-align:top;">:</td><td><div>default_admin/index.html</div></td></tr></table></div>'
+tRp138
+sS'locals'
+p139
+(dp140
+S'k'
+S"'select'"
+p141
+sS'self'
+p142
+S"<Row {'meal_rate': '30', 'meal_name': 'Breakfast', 'id': 1L}>"
+p143
+sssS'traceback'
+p144
+S'Traceback (most recent call last):\n  File "/home/scorpio/web2py/gluon/restricted.py", line 227, in restricted\n    exec ccode in environment\n  File "/home/scorpio/web2py/applications/mess_menu_v1/views/default_admin/index.html", line 36, in <module>\n    <div class="panel panel-red">\n  File "/home/scorpio/web2py/gluon/packages/dal/pydal/objects.py", line 90, in __getattr__\n    raise AttributeError\nAttributeError\n'
+p145
+s.

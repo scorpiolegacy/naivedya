@@ -1,0 +1,472 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.AttributeError'> "
+p3
+sS'layer'
+p4
+S'/home/scorpio/web2py/applications/mess_menu_v1/controllers/default.py'
+p5
+sS'code'
+p6
+S'# -*- coding: utf-8 -*-\n# this file is released under public domain and you can use without limitations\n\n#########################################################################\n## This is a sample controller\n## - index is the default action of any application\n## - user is required for authentication and authorization\n## - download is for downloading files uploaded in the db (does streaming)\n#########################################################################\nstate_name=[\'Andhra Pradesh\', \'Arunachal Pradesh\', \'Assam\', \'Bihar\', \'Chhattisgarh\', \'Goa\', \'Gujarat\', \'Haryana\', \'Himachal Pradesh\', \'Jammu & Kashmir\', \'Jharkhand\', \'Karnataka\', \'Kerala\', \'Madhya Pradesh\', \'Maharashtra\', \'Manipur\', \'Meghalaya\', \'Mizoram\', \'Nagaland\', \'Odisha\', \'Punjab\', \'Rajasthan\', \'Sikkim\', \'Tamil Nadu\', \'Telangana \', \'Tripura\', \'Uttar Pradesh\', \'Uttarakhand\', \'West Bengal\']\n\nimport datetime\n\ndef oncompare_time(food_meal,food_date):\n    food_time=db(food_meal==db.Meal.meal_name).select(db.Meal.ALL)\n    diff_datetime=datetime.datetime(\n        food_date.year,\n        food_date.month,\n        food_date.day)\n    return True\n\ndays=[\'Monday\',\'Tuesday\',\'Wednesday\',\'Thursday\',\'Friday\',\'Saturday\',\'Sunday\']\nmenu_data={}\nmenu_timings=db().select(db.Meal.meal_name)\ndef classify_menu():\n    for row1 in db().select(db.mess_provider.place_of_mess, distinct=True):\n        p=row1.place_of_mess\n        Cater_Name={}\n        for row2 in db(p==db.mess_provider.place_of_mess).select(db.mess_provider.caterer_name,distinct=True):\n            c=row2.caterer_name\n            d=[[],[],[],[],[],[],[]]\n            for ss in range(7):\n                for add in range(len(menu_timings)):\n                    d[ss].append([])\n            for row3 in db(p==db.mess_menu.place_of_mess and c==db.mess_menu.caterer_name).select():\n                for i in range(7):\n                    if row3.week_day==days[i]:\n                        for k in range(len(menu_timings)):\n                            if row3.mess_time==menu_timings[k].meal_name:\n                                d[i][k].append(row3.eating_item)\n                                break\n                        break\n            Cater_Name[c]=d\n        menu_data[p]=Cater_Name\n\ndef index():\n    """\n    example action using the internationalization operator T and flash\n    rendered by views/default/index.html or views/generic.html\n\n    if you need a simple wiki simply replace the two lines below with:\n    return auth.wiki()\n    """\n    #response.flash = T("Hello World")\n    if auth.is_logged_in():\n        redirect(URL(\'default\',\'after_login_index\'))\n    return dict(message=auth.user)\n\n@auth.requires_login()\ndef after_login_index():\n    if db(auth.user.id==db.user_details.user_id).count()==0:\n        redirect(URL(\'default\',\'complete_profile\'))\n    return locals()\n\n@auth.requires_login()\ndef complete_profile():\n    form=\'\'\n    if db(auth.user.id==db.user_details.user_id).count()==0:\n        db.user_details.user_id.writable=False\n        db.user_details.user_id.readable=False\n        db.user_details.account_initial_balance.writable=False\n        db.user_details.account_initial_balance.readable=False\n        db.user_details.account_curr_balance.writable=False\n        db.user_details.account_curr_balance.readable=False\n        form=SQLFORM(db.user_details)\n        form.vars.account_initial_balance=0\n        form.vars.account_curr_balance=0;\n        form.vars.user_id=auth.user.id\n        if form.process().accepted:\n            session.flash="Profile completed"\n            redirect(URL(\'default\',\'after_login_index\'))\n        elif form.errors:\n            response.flash=\'Please complete your profile\'\n    else:\n        temp=db(auth.user.id==db.user_details.user_id).select(db.user_details.ALL)\n        form=SQLFORM.factory(\n            Field(\'phone_number\',requires=IS_MATCH(\'\\d{10}\'),default=temp[0].phone_number),\n            Field(\'preferred_mess\',requires=IS_IN_DB(db,\'mess_provider.place_of_mess\'),default=temp[0].preferred_mess),\n            Field(\'preferred_caterer\',requires=IS_IN_DB(db,\'mess_provider.caterer_name\'),default=temp[0].preferred_caterer),\n            Field(\'your_booking_preference\',requires=IS_IN_SET([\'\'\'Don\'t Book Food Automatically\'\'\',\'Book Food Automatically\']),default=temp[0].your_booking_preference))\n        \n        if form.process().accepted:\n            row=db(auth.user.id==db.user_details.user_id).select(db.user_details.user_id)\n            curr_id=row[0].user_id\n            db(curr_id==db.user_details.user_id).update(\n                phone_number=form.vars.phone_number,\n                preferred_mess=form.vars.preferred_mess,\n                preferred_caterer=form.vars.prefrred_caterer,\n                your_booking_preference=form.vars.your_booking_preference)\n            session.flash=\'Profile successfully edited\'\n            redirect(URL(\'default\',\'after_login_index\'))\n            \n        elif form.errors:\n            response.flash="Please fill in valid details"\n    return locals()\n\ndef mess_menu():\n    classify_menu()\n    return dict(menu_data=menu_data,days=days,menu_timing=menu_timings)\n\n@auth.requires_login()\ndef reserve_meal():\n    form1=SQLFORM.factory(\n                Field(\'reserve_eating_place\',label=\'Mess Place\',requires=IS_IN_DB(db,\'mess_provider.place_of_mess\')),\n                Field(\'reserve_caterer\',label=\'Caterer\',requires=IS_IN_DB(db,\'mess_provider.caterer_name\')),\n                Field(\'reserve_start_date\',\'date\',label=\'Start Date\'),\n                Field(\'reserve_end_date\',\'date\',label=\'End Date\'),\n                Field(\'reserve_start_meal\',label=\'Start Meal\',requires=IS_IN_DB(db,\'Meal.meal_name\')),\n                Field(\'reserve_end_meal\',label=\'End Meal\',requires=IS_IN_DB(db,\'Meal.meal_name\')))\n    \n    if form1.process().accepted:\n        deduction=0\n        #date_list=map(int,form1.vars.reserve_start_date.split(\'-\'))\n        start=form1.vars.reserve_start_date\n        #date_list=map(int,form1.vars.reserve_end_date.split(\'-\'))\n        end=form1.vars.reserve_end_date\n        meal_s=form1.vars.reserve_start_meal\n        meal_e=form1.vars.reserve_end_meal\n        delta=end-start\n        meal_list=db().select(db.Meal.meal_name)\n        #redirect(URL(\'default\',\'index/\'+str(len(meal_list))))\n        rate_list=db().select(db.Meal.meal_rate)\n        if (delta.days-1)<0:\n            start_pos=0\n            end_pos=0\n            for i in range(len(meal_list)):\n                if meal_list[i].meal_name==meal_s:\n                    start_pos=i\n                    break\n            for i in range(len(meal_list)):\n                if meal_list[i].meal_name==meal_e:\n                    end_pos=i\n                    break\n            j=start_pos\n\n            while j<=end_pos:\n                row=db(auth.user.id==db.reserve_food.author_id).select(db.reserve_food.ALL)\n                found=False\n                for x in row:\n                    if (x.reserve_meal==meal_list[j].meal_name and x.reserve_date==form1.vars.reserve_start_date):\n                        found=True\n                        break\n                if not found:\n                    db.reserve_food.insert(\n                        reserve_eating_place=form1.vars.reserve_eating_place,\n                        reserve_caterer=form1.vars.reserve_caterer,\n                        reserve_date=form1.vars.reserve_start_date,\n                        reserve_meal=meal_list[j].meal_name,\n                        author_id=auth.user.id)\n                    deduction=deduction+int(rate_list[j].meal_rate)\n                j=j+1\n        \n        else:\n            start_pos=0\n            end_pos=0\n            for i in range(len(meal_list)):\n                if meal_list[i].meal_name==meal_s:\n                    start_pos=i\n                    break\n            for i in range(len(meal_list)):\n                if meal_list[i].meal_name==meal_e:\n                    end_pos=i\n                    break\n            j=start_pos\n            while j<range(len(meal_list)):\n                row=db(auth.user.id==db.reserve_food.author_id).select(db.reserve_food.ALL)\n                found=False\n                if j>=len(meal_list):\n                    break\n                for x in row:\n                    if (x.reserve_meal==meal_list[j].meal_name and x.reserve_date==form1.vars.reserve_start_date):\n                        found=True\n                        break\n                if not found:\n                    db.reserve_food.insert(\n                        reserve_eating_place=form1.vars.reserve_eating_place,\n                        reserve_caterer=form1.vars.reserve_caterer,\n                        reserve_date=form1.vars.reserve_start_date,\n                        reserve_meal=meal_list[j].meal_name,\n                        author_id=auth.user.id)\n                    deduction=deduction+int(rate_list[j].meal_rate)\n                j=j+1\n            j=0\n            while j<=end_pos:\n                row=db(auth.user.id==db.reserve_food.author_id).select(db.reserve_food.ALL)\n                found=False\n                for x in row:\n                    if (x.reserve_meal==meal_list[j].meal_name and x.reserve_date==form1.vars.reserve_start_date):\n                        found=True\n                        break\n                if not found:\n                    db.reserve_food.insert(\n                        reserve_eating_place=form1.vars.reserve_eating_place,\n                        reserve_caterer=form1.vars.reserve_caterer,\n                        reserve_date=form1.vars.reserve_end_date,\n                        reserve_meal=meal_list[j].meal_name,\n                        author_id=auth.user.id)\n                    deduction=deduction+int(rate_list[j].meal_rate)\n                j=j+1\n\n            i=0\n            number_of_entry=delta.days-1\n            start=start+datetime.timedelta(days=1)\n            while i<number_of_entry:\n                #temp=start.year+\'-\'+start.month+\'-\'+start.day\n                for j in range(len(meal_list)):\n                    row=db(auth.user.id==db.reserve_food.author_id).select(db.reserve_food.ALL)\n                    found=False\n                    for x in row:\n                        if (x.reserve_meal==meal_list[j].meal_name and x.reserve_date==start):\n                            found=True\n                            break\n                    if not found:\n                        db.reserve_food.insert(\n                            reserve_eating_place=form1.vars.reserve_eating_place,\n                            reserve_caterer=form1.vars.reserve_caterer,\n                            reserve_date=start,\n                            reserve_meal=meal_list[j].meal_name,\n                            author_id=auth.user.id)\n                        deduction=deduction+int(rate_list[j].meal_rate)\n                start=start+datetime.timedelta(days=1)\n                i=i+1\n        acc_balance=db(auth.user.id==db.user_details.user_id).select(db.user_details.account_curr_balance);\n        auth_user_curr_balance=acc_balance[0]\n        if (int(auth_user_curr_balance)-deduction)<0:\n            if auth.account_type==\'Student\':\n                response.flash=\'\'\'Account Balance can\'t be negative. Please contact Mess Administrator\'\'\'\n            else:\n                auth_user_curr_balance=str(int(auth_user_curr_balance)-deduction)\n                caterer_booked=db(db.mess_provider.caterer_name==form1.vars.reserve_caterer).select(db.mess_provider.ALL)\n                db(db.mess_provider.id==caterer_booked[0].id).update(\n                    account_curr_balance=str(int(caterer_booked[0].account_curr_balance)+deduction))\n                db(db.user_details.user_id==auth.user.id).update(\n                    account_curr_balance=auth_user_curr_balance)\n                response.flash=\'\'\'Your food is successfully reserved\'\'\'\n        else:\n            auth_user_curr_balance=str(int(auth_user_curr_balance)-deduction)\n            caterer_booked=db(db.mess_provider.caterer_name==form1.vars.reserve_caterer).select(db.mess_provider.id,db.mess_provider.account_curr_balance)\n            db(db.mess_provider.id==caterer_booked[0].id).update(\n                account_curr_balance=str(int(caterer_booked[0].account_curr_balance)+deduction))\n            db(db.user_details.user_id==auth.user.id).update(\n                account_curr_balance=auth_user_curr_balance)\n            response.flash=\'\'\'Your food is successfully reserved\'\'\'\n    return locals()\n\n@auth.requires_login()\ndef manage_cancellation(table,row_id):\n    #redirect(URL(\'default\',\'manage_cancellation\'))\n    acc_balance=db(auth.user.id==db.user_details.user_id).select(db.user_details.account_curr_balance);\n    auth_user_curr_balance=acc_balance[0]\n    temp=db(row_id==db.reserve_food.id).select(db.reserve_food.ALL)\n    mymealname=temp[0].reserve_meal\n    cat_name=temp[0].reserve_caterer\n    y=db(db.Meal.meal_name==mymealname).select(db.Meal.ALL)\n    auth_user_curr_balance=int(auth_user_curr_balance)+int(y[0].meal_rate)\n    c=db(db.mess_provider.caterer_name==cat_name).select(db.mess_provider.ALL)\n    caterer_b=int(c[0].account_curr_balance)-int(y[0].meal_rate)\n    db(temp[0].author_id==db.auth_user.id).update(account_curr_balance=auth_user_curr_balance)\n    db(c[0].id==db.mess_provider.id).update(account_curr_balance=caterer_b)\n    db(row_id==db.reserve_food.id).delete()\n\n@auth.requires_login()\ndef cancel_meal():\n    query=((db.reserve_food.author_id==auth.user.id))\n    fields=(db.reserve_food.reserve_meal,\n            db.reserve_food.reserve_date,\n            db.reserve_food.reserve_eating_place,\n            db.reserve_food.reserve_caterer)\n    headers={\n    \'reserve_food.reserve_meal\':\'Booked Meals\',\n    \'reserve_food.reserve_date\':\'Booking Date\',\n    \'reserve_food.reserve_eating_place\':\'Booked Mess\',\n    \'reserve_food.reserve_caterer\':\'Booked Caterer\'\n    }\n    default_sort_order=[~db.reserve_food.reserve_date,]\n    grid1=SQLFORM.grid(query=query, fields=fields, headers=headers, orderby=default_sort_order,\n                create=False, deletable=True, editable=False,ondelete=manage_cancellation)\n    return locals()\n\ndef mess_people():\n    return locals()\n\ndef mess_incharge():\n    query=((db.auth_user.account_class==\'Admin\') & (db.user_details.user_id==db.auth_user.id))\n    row=db(query).select()\n    return locals()\n\ndef mess_commitee():\n    query=((db.auth_user.account_class==\'Mess Committee\') & (db.user_details.user_id==db.auth_user.id))\n    row=db(query).select()\n    return locals()\n\ndef mess_caterer():\n    row=db().select(db.mess_provider.caterer_name,db.mess_provider.phone_number,db.mess_provider.place_of_mess)\n    return locals()\n\ndef general_notifications():\n    return locals()\n\n@auth.requires_login()\ndef complaint_section():\n    db.complaint_register.complaint_register_isresolved.default=False\n    db.complaint_register.complaint_register_isresolved.readable=False\n    db.complaint_register.complaint_register_isresolved.writable=False\n    form1=SQLFORM(db.complaint_register)\n    if form1.process().accepted:\n        session.flash="Complaint registered"\n        redirect(URL("default","index"))\n    elif form1.errors:\n        response.flash="Fill out the complaint form properly"\n    return locals()\n\n@auth.requires_login()\ndef admin_change_remove():\n    if auth.user.account_class==\'Admin\':\n        if request.vars.modify==\'People\':\n            db.auth_user.id.readable=False\n            db.auth_user.account_curr_balance.writable=True\n            db.auth_user.account_initial_balance.writable=True\n            query=((db.auth_user.account_class!=\'Admin\' or db.auth_user.id!=auth.user.id))\n            fields=(db.auth_user.first_name,db.auth_user.last_name,db.auth_user.email,db.auth_user.account_curr_balance)\n            headers={\n            \'auth_user.first_name\':"First Name",\n            \'auth_user.last_name\':"Last Name",\n            \'auth_user.email\':"Email",\n            \'auth_user.account_curr_balance\':"Current Account Balance"\n            }\n            default_sort_order=[db.auth_user.first_name]\n\n            grid1=SQLFORM.grid(query=query, fields=fields, headers=headers, orderby=default_sort_order,\n                    create=True, deletable=True, editable=True)\n        elif request.vars.modify==\'Caterer\':\n            db.mess_provider.id.readable=False\n            db.mess_provider.account_curr_balance.writable=True\n            db.mess_provider.account_curr_balance.readable=True\n            fields=(\n                db.mess_provider.caterer_name,\n                db.mess_provider.email,\n                db.mess_provider.account_curr_balance,\n                db.mess_provider.phone_number)\n            query=db.mess_provider.id>0\n            headers={\n            \'mess_provider.caterer_name\':"Caterer Name",\n            \'mess_provider.email\':"Email",\n            \'mess_provider.account_curr_balance\':"Current Account Balance",\n            \'mess_provider.phone_number\':"Phone number",\n            }\n            default_sort_order=[db.mess_provider.caterer_name]\n            grid1=SQLFORM.grid(\n                    query=query,\n                    fields=fields,\n                    headers=headers,\n                    orderby=default_sort_order,\n                    create=True,\n                    deletable=True,\n                    editable=True)\n        elif request.vars.modify==\'Mess_Place\':\n            form1=SQLFORM.grid(db.mess_places,editable=True,orderby=[db.mess_places.place_name])\n        elif request.vars.modify==\'Mess_Menu\':\n            form1=SQLFORM.grid(db.mess_menu,editable=True,orderby=[db.mess_menu.eating_item])\n        elif request.vars.modify==\'meals_timing\':\n            form1=SQLFORM.grid(db.meals_timing,editable=True,orderby=[db.meals_timing.mess_place])\n        elif request.vars.modify==\'meal_rate\':\n            form1=SQLFORM.grid(db.Meal,editable=True,orderby=[db.Meal.meal_name])\n        elif request.vars.modify==\'manage_people\':\n            form1=SQLFORM.grid(db.auth_user,editable=True,orderby=[db.auth_user.first_name])\n        else:\n            h=\'Invalid Page\'\n            redirect(URL(\'default\',\'index\'))\n    else:\n        h=\'Permission Denied\'\n    return locals()\n\ndef manageregistration(form):\n    #db.user_details.insert(user_id=rowid);\n    return\n    \ndef registration_page():\n    if auth.is_logged_in():\n        session.flash="Already logged in. No registration required"\n        redirect(URL(\'default\',\'index\'))\n        return locals()\n    else :\n        registration_form=auth.register()\n        return dict(signup_form=registration_form)\n\ndef user():\n    """\n    exposes:\n    http://..../[app]/default/user/login\n    http://..../[app]/default/user/logout\n    http://..../[app]/default/user/register\n    http://..../[app]/default/user/profile\n    http://..../[app]/default/user/retrieve_password\n    http://..../[app]/default/user/change_password\n    http://..../[app]/default/user/manage_users (requires membership in\n    http://..../[app]/default/user/bulk_register\n    use @auth.requires_login()\n        @auth.requires_membership(\'group name\')\n        @auth.requires_permission(\'read\',\'table name\',record_id)\n    to decorate functions that need access control\n    """\n    if request.args(0)==\'profile\':\n        db.user_details.account_curr_balance.writable=False\n        db.user_details.account_initial_balance.writable=False\n        db.user_details.account_curr_balance.readable=True\n        db.user_details.account_initial_balance.readable=True\n        row1=db(auth.user.id==db.user_details.user_id).select(db.user_details.ALL)\n        return locals()\n    elif request.args(0)==\'register\':\n        redirect(URL(\'default\',\'registration_page\'));\n    return dict(form=auth())\n\n@cache.action()\ndef download():\n    """\n    allows downloading of uploaded files\n    http://..../[app]/default/download/[filename]\n    """\n    return response.download(request, db)\n\n\ndef call():\n    """\n    exposes services. for example:\n    http://..../[app]/default/call/jsonrpc\n    decorate with @services.jsonrpc the functions to expose\n    supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv\n    """\n    return service()\n\nresponse._vars=response._caller(complaint_section)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__hash__'
+p12
+S"<method-wrapper '__hash__' of exceptions.AttributeError object>"
+p13
+sS'__setattr__'
+p14
+S"<method-wrapper '__setattr__' of exceptions.AttributeError object>"
+p15
+sS'__reduce_ex__'
+p16
+S'<built-in method __reduce_ex__ of exceptions.AttributeError object>'
+p17
+sS'__getslice__'
+p18
+S"<method-wrapper '__getslice__' of exceptions.AttributeError object>"
+p19
+sS'__getitem__'
+p20
+S"<method-wrapper '__getitem__' of exceptions.AttributeError object>"
+p21
+sS'__setstate__'
+p22
+S'<built-in method __setstate__ of exceptions.AttributeError object>'
+p23
+sS'__reduce__'
+p24
+S'<built-in method __reduce__ of exceptions.AttributeError object>'
+p25
+sS'__str__'
+p26
+S"<method-wrapper '__str__' of exceptions.AttributeError object>"
+p27
+sS'__format__'
+p28
+S'<built-in method __format__ of exceptions.AttributeError object>'
+p29
+sS'__getattribute__'
+p30
+S"<method-wrapper '__getattribute__' of exceptions.AttributeError object>"
+p31
+sS'__class__'
+p32
+S"<type 'exceptions.AttributeError'>"
+p33
+sS'__unicode__'
+p34
+S'<built-in method __unicode__ of exceptions.AttributeError object>'
+p35
+sS'__delattr__'
+p36
+S"<method-wrapper '__delattr__' of exceptions.AttributeError object>"
+p37
+sS'__subclasshook__'
+p38
+S'<built-in method __subclasshook__ of type object>'
+p39
+sS'__repr__'
+p40
+S"<method-wrapper '__repr__' of exceptions.AttributeError object>"
+p41
+sS'args'
+p42
+S'()'
+p43
+sS'__dict__'
+p44
+S'{}'
+p45
+sS'__sizeof__'
+p46
+S'<built-in method __sizeof__ of exceptions.AttributeError object>'
+p47
+sS'__doc__'
+p48
+S"'Attribute not found.'"
+p49
+sS'__init__'
+p50
+S"<method-wrapper '__init__' of exceptions.AttributeError object>"
+p51
+sS'__new__'
+p52
+S'<built-in method __new__ of type object>'
+p53
+ssS'evalue'
+p54
+S''
+sS'request'
+p55
+cgluon.html
+XML_unpickle
+p56
+(S's\xf4Z\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">ajax</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">application</td><td style="vertical-align:top;">:</td><td><div>mess_menu_v1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cid</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">client</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">controller</td><td style="vertical-align:top;">:</td><td><div>default</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_admin</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-8575f945-3e01-4146-895b-05c31ea8e770<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_mess_menu_v1</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-94b3da1e-f9f2-402c-b285-a35ef9e41843<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_welcome</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-2ea632b7-15a8-4e02-9f7d-9c1970d8554a<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">env</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT</td><td style="vertical-align:top;">:</td><td><div>text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_ENCODING</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_LANGUAGE</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.5</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONNECTION</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_COOKIE</td><td style="vertical-align:top;">:</td><td><div>session_id_welcome=127.0.0.1-2ea632b7-15a8-4e02-9f7d-9c1970d8554a; session_id_admin=127.0.0.1-8575f945-3e01-4146-895b-05c31ea8e770; session_id_mess_menu_v1=127.0.0.1-94b3da1e-f9f2-402c-b285-a35ef9e41843</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_HOST</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_REFERER</td><td style="vertical-align:top;">:</td><td><div>http://127.0.0.1:8000/mess_menu_v1/default/after_login_index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_USER_AGENT</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:41.0) Gecko/20100101 Firefox/41.0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">PATH_INFO</td><td style="vertical-align:top;">:</td><td><div>/mess_menu_v1/default/complaint_section</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">QUERY_STRING</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_ADDR</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_PORT</td><td style="vertical-align:top;">:</td><td><div>50958</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_METHOD</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SCRIPT_NAME</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_NAME</td><td style="vertical-align:top;">:</td><td><div>scorpio</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PORT</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PROTOCOL</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_SOFTWARE</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/scorpio/web2py/applications/welcome/&#x27;, &#x27;/home/scorpio/web2py/applications/mess_menu_v1/&#x27;, &#x27;/home/scorpio/web2py/applications/examples/&#x27;, &#x27;/home/scorpio/web2py/applications/admin/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0xb5b5bbec: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;127.0.0.1&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;ips&#x27;: [&#x27;127.0.1.1&#x27;], &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;scheduler_groups&#x27;: None, &#x27;port&#x27;: 8000, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;scorpio&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;print_errors&#x27;: False, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;/home/scorpio/web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;&lt;ask&gt;&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept</td><td style="vertical-align:top;">:</td><td><div>text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_encoding</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_language</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.5</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_connection</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cookie</td><td style="vertical-align:top;">:</td><td><div>session_id_welcome=127.0.0.1-2ea632b7-15a8-4e02-9f7d-9c1970d8554a; session_id_admin=127.0.0.1-8575f945-3e01-4146-895b-05c31ea8e770; session_id_mess_menu_v1=127.0.0.1-94b3da1e-f9f2-402c-b285-a35ef9e41843</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_host</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_referer</td><td style="vertical-align:top;">:</td><td><div>http://127.0.0.1:8000/mess_menu_v1/default/after_login_index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_user_agent</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:41.0) Gecko/20100101 Firefox/41.0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>scorpio</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path_info</td><td style="vertical-align:top;">:</td><td><div>/mess_menu_v1/default/complaint_section</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">query_string</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_addr</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_port</td><td style="vertical-align:top;">:</td><td><div>50958</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_method</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_uri</td><td style="vertical-align:top;">:</td><td><div>/mess_menu_v1/default/complaint_section</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">script_name</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_name</td><td style="vertical-align:top;">:</td><td><div>scorpio</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_port</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_protocol</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_software</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_path</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.12.3-stable+timestamp.2015.08.19.00.18.03</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0xb74ce0d0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0xb691502c&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0xad30d92c&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0xb74ce0d0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0xb691502c&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0xad30d92c&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">extension</td><td style="vertical-align:top;">:</td><td><div>html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">folder</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py/applications/mess_menu_v1/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">function</td><td style="vertical-align:top;">:</td><td><div>complaint_section</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">global_settings</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/scorpio/web2py/applications/welcome/&#x27;, &#x27;/home/scorpio/web2py/applications/mess_menu_v1/&#x27;, &#x27;/home/scorpio/web2py/applications/examples/&#x27;, &#x27;/home/scorpio/web2py/applications/admin/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0xb5b5bbec: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;127.0.0.1&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;ips&#x27;: [&#x27;127.0.1.1&#x27;], &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;scheduler_groups&#x27;: None, &#x27;port&#x27;: 8000, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;scorpio&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;print_errors&#x27;: False, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;/home/scorpio/web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;&lt;ask&gt;&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>scorpio</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.12.3-stable+timestamp.2015.08.19.00.18.03</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_https</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_local</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_restful</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_sheduler</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_shell</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">now</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2015, 10, 24, 13, 27, 57, 381517)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_args</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_extension</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">url</td><td style="vertical-align:top;">:</td><td><div>/mess_menu_v1/default/complaint_section</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">utcnow</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2015, 10, 24, 7, 57, 57, 381559)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi</td><td style="vertical-align:top;">:</td><td><div>&lt;gluon.main.LazyWSGI object at 0xadda9a8c&gt;</div></td></tr></table></div>'
+tRp57
+sS'frames'
+p58
+(lp59
+(dp60
+S'file'
+p61
+S'/home/scorpio/web2py/gluon/restricted.py'
+p62
+sS'dump'
+p63
+(dp64
+S'environment'
+p65
+S"{'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'ASSIGNJS': <function ASSIGNJS>, 'AppConfig': <function AppConfig>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, ...}"
+p66
+sS'ccode'
+p67
+S'<code object <module> at 0xade06530, file "/home...ns/mess_menu_v1/controllers/default.py", line 10>'
+p68
+ssS'lnum'
+p69
+I227
+sS'lines'
+p70
+(dp71
+I224
+S'            ccode = code'
+p72
+sI225
+S'        else:'
+p73
+sI226
+S'            ccode = compile2(code, layer)'
+p74
+sI227
+S'        exec ccode in environment'
+p75
+sI228
+S'    except HTTP:'
+p76
+sI229
+S'        raise'
+p77
+sI230
+S'    except RestrictedError:'
+p78
+sI231
+S'        # do not encapsulate (obfuscate) the original RestrictedError'
+p79
+sI222
+S'    try:'
+p80
+sI223
+S'        if isinstance(code, types.CodeType):'
+p81
+ssS'call'
+p82
+S"(code='# -*- coding: utf-8 -*-\\n# this file is released ...sponse._vars=response._caller(complaint_section)\\n', environment={'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'ASSIGNJS': <function ASSIGNJS>, 'AppConfig': <function AppConfig>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, ...}, layer='/home/scorpio/web2py/applications/mess_menu_v1/controllers/default.py')"
+p83
+sS'func'
+p84
+S'restricted'
+p85
+sa(dp86
+g61
+S'/home/scorpio/web2py/applications/mess_menu_v1/controllers/default.py'
+p87
+sg63
+(dp88
+sg69
+I442
+sg70
+(dp89
+I431
+S''
+sI432
+S''
+sI433
+S'def call():'
+p90
+sI434
+S'    """'
+p91
+sI435
+S'    exposes services. for example:'
+p92
+sI436
+S'    http://..../[app]/default/call/jsonrpc'
+p93
+sI437
+S'    decorate with @services.jsonrpc the functions to expose'
+p94
+sI438
+S'    supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv'
+p95
+sI439
+S'    """'
+p96
+sI440
+S'    return service()'
+p97
+ssg82
+S'()'
+p98
+sg84
+S'<module>'
+p99
+sa(dp100
+g61
+S'/home/scorpio/web2py/gluon/globals.py'
+p101
+sg63
+(dp102
+S'self'
+p103
+S'undefined'
+p104
+sS'f'
+S'<function complaint_section>'
+p105
+ssg69
+I412
+sg70
+(dp106
+I416
+S"        self.generic_patterns = ['*']"
+p107
+sI407
+S"        self.flash = ''            # used by the default view layout"
+p108
+sI408
+S'        self.meta = Storage()      # used by web2py_ajax.html'
+p109
+sI409
+S'        self.menu = []             # used by the default view layout'
+p110
+sI410
+S'        self.files = []            # used by web2py_ajax.html'
+p111
+sI411
+S'        self._vars = None'
+p112
+sI412
+S'        self._caller = lambda f: f()'
+p113
+sI413
+S'        self._view_environment = None'
+p114
+sI414
+S'        self._custom_commit = None'
+p115
+sI415
+S'        self._custom_rollback = None'
+p116
+ssg82
+S'(f=<function complaint_section>)'
+p117
+sg84
+S'<lambda>'
+p118
+sa(dp119
+g61
+S'/home/scorpio/web2py/gluon/tools.py'
+p120
+sg63
+(dp121
+S'action'
+p122
+S'<function complaint_section>'
+p123
+sS'a'
+S'()'
+p124
+sS'b'
+g45
+ssg69
+I3774
+sg70
+(dp125
+I3776
+S'            f.__name__ = action.__name__'
+p126
+sI3777
+S'            f.__dict__.update(action.__dict__)'
+p127
+sI3778
+S'            return f'
+p128
+sI3769
+S'                    flag = condition'
+p129
+sI3770
+S'                if not flag:'
+p130
+sI3771
+S'                    current.session.flash = self.messages.access_denied'
+p131
+sI3772
+S'                    return call_or_redirect('
+p132
+sI3773
+S'                        self.settings.on_failed_authorization)'
+p133
+sI3774
+S'                return action(*a, **b)'
+p134
+sI3775
+S'            f.__doc__ = action.__doc__'
+p135
+ssg82
+S'(*a=(), **b={})'
+p136
+sg84
+S'f'
+sa(dp137
+g61
+S'/home/scorpio/web2py/applications/mess_menu_v1/controllers/default.py'
+p138
+sg63
+(dp139
+S'global db'
+p140
+S'<DAL uri="sqlite://storage.sqlite">'
+p141
+sS'db.complaint_register'
+p142
+S'<Table complaint_register (id,complaint_subject,...e,created_on,created_by,modified_on,modified_by)>'
+p143
+sS'db.complaint_register.complaint_register_isresolved'
+p144
+g104
+sS'builtinFalse'
+p145
+S'False'
+p146
+ssg69
+I312
+sg70
+(dp147
+I307
+S'def general_notifications():'
+p148
+sI308
+S'    return locals()'
+p149
+sI309
+S''
+sI310
+S'@auth.requires_login()'
+p150
+sI311
+S'def complaint_section():'
+p151
+sI312
+S'    db.complaint_register.complaint_register_isresolved.default=False'
+p152
+sI313
+S'    db.complaint_register.complaint_register_isresolved.readable=False'
+p153
+sI314
+S'    db.complaint_register.complaint_register_isresolved.writable=False'
+p154
+sI315
+S'    form1=SQLFORM(db.complaint_register)'
+p155
+sI316
+S'    if form1.process().accepted:'
+p156
+ssg82
+S'()'
+p157
+sg84
+S'complaint_section'
+p158
+sa(dp159
+g61
+S'/home/scorpio/web2py/gluon/packages/dal/pydal/helpers/classes.py'
+p160
+sg63
+(dp161
+S'builtinAttributeError'
+p162
+S"<type 'exceptions.AttributeError'>"
+p163
+ssg69
+I30
+sg70
+(dp164
+I32
+S'    __setitem__ = object.__setattr__'
+p165
+sI33
+S''
+sI34
+S'    def __delitem__(self, key):'
+p166
+sI25
+S''
+sI26
+S'    def __getattr__(self, key):'
+p167
+sI27
+S'        try:'
+p168
+sI28
+S'            return self.__dict__.__getitem__(str(key))'
+p169
+sI29
+S'        except:'
+p170
+sI30
+S'            raise AttributeError'
+p171
+sI31
+S''
+ssg82
+S"(self=<Table complaint_register (id,complaint_subject,...e,created_on,created_by,modified_on,modified_by)>, key='complaint_register_isresolved')"
+p172
+sg84
+S'__getattr__'
+p173
+sasS'pyver'
+p174
+S'Python 2.7.6: /usr/bin/python (prefix: /usr)'
+p175
+sS'session'
+p176
+g56
+(S's\t\n\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">auth</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">expiration</td><td style="vertical-align:top;">:</td><td><div>3600</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">hmac_key</td><td style="vertical-align:top;">:</td><td><div>53421ca7-de02-4e5c-94e9-b142f8825241</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_visit</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2015, 10, 24, 13, 27, 53, 204524)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remember_me</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">account_class</td><td style="vertical-align:top;">:</td><td><div>Student</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">email</td><td style="vertical-align:top;">:</td><td><div>upendra1rd@gmail.com</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">first_name</td><td style="vertical-align:top;">:</td><td><div>Upendra</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">id</td><td style="vertical-align:top;">:</td><td><div>11L</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_name</td><td style="vertical-align:top;">:</td><td><div>Kumar</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_id</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">reset_password_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">roll_no</td><td style="vertical-align:top;">:</td><td><div>IS201401048</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user_groups</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">65</td><td style="vertical-align:top;">:</td><td><div>user_11</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr></table></div>'
+tRp177
+sS'etype'
+p178
+S"<type 'exceptions.AttributeError'>"
+p179
+sS'date'
+p180
+S'Sat Oct 24 13:27:57 2015'
+p181
+sS'response'
+p182
+g56
+(S's\xb52\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">body</td><td style="vertical-align:top;">:</td><td><div>&lt;cStringIO.StringO object at 0xad7e3e60&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">caterer</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div><table><tr><td><div>Number of people</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/caterer_people</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_mess_menu_v1</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-94b3da1e-f9f2-402c-b285-a35ef9e41843<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div>/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">delimiters</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>{{</div></td></tr><tr><td><div>}}</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">files</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">form_label_separator</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">formstyle</td><td style="vertical-align:top;">:</td><td><div>bootstrap3_inline</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generic_patterns</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>*</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">google_analytics_id</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">headers</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">X-Powered-By</td><td style="vertical-align:top;">:</td><td><div>web2py</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">logo</td><td style="vertical-align:top;">:</td><td><div><a href="http://www.iiits.ac.in/" id="web2py-logo"><img height="55px" src="/mess_menu_v1/static/images/iiits_logo.jpg" /></a></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">managing_admin</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div><table><tr><td><div>Add/Change/Remove</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>People</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/admin_change_remove.html?modify=People</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Caterer</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/admin_change_remove.html?modify=Caterer</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Mess Place</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/admin_change_remove.html?modify=Mess_Place</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Issue Notifications</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Approve Registration</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Student</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Faculty</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Staff Members</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Mess Committee Member</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Caterer</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Change Mess Menu</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">menu</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div><table><tr><td><div>Home</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/index</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Menu Details</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_menu</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Reserve/Cancel Meal</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/reserve_cancel</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Reserve Meal</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/reserve_meal</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Cancel Meal</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/cancel_meal</div></td></tr><tr><td><div>[]</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>People</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_people</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Mess-Incharge</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_incharge</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Mess-Committee Members</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_commitee</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Caterers</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/mess_caterer</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>General Notifications</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/general_notifications</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Complaint Section</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/mess_menu_v1/default/complaint_section</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">meta</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">author</td><td style="vertical-align:top;">:</td><td><div>Your Name &lt;you@example.com&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">description</td><td style="vertical-align:top;">:</td><td><div>a cool new app</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generator</td><td style="vertical-align:top;">:</td><td><div>Web2py Web Framework</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">keywords</td><td style="vertical-align:top;">:</td><td><div>web2py, python, framework</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">models_to_run</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>^\\w+\\.py$</div></td></tr><tr><td><div>^default/\\w+\\.py$</div></td></tr><tr><td><div>^default/complaint_section/\\w+\\.py$</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">postprocessing</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_client</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_compression_level</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_expires</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_key</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_data_name</td><td style="vertical-align:top;">:</td><td><div>session_data_mess_menu_v1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_file</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;/home/scorpio/web2py/applications/mess_menu_v1/sessions/10c/0c2/127.0.0.1-94b3da1e-f9f2-402c-b285-a35ef9e41843&#x27;, mode &#x27;rb+&#x27; at 0xacda3180&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_filename</td><td style="vertical-align:top;">:</td><td><div>/home/scorpio/web2py/applications/mess_menu_v1/sessions/127.0.0.1-94b3da1e-f9f2-402c-b285-a35ef9e41843</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_hash</td><td style="vertical-align:top;">:</td><td><div>7bab1bc31c5c4871061ebdc34d2c93c9</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-94b3da1e-f9f2-402c-b285-a35ef9e41843</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_name</td><td style="vertical-align:top;">:</td><td><div>session_id_mess_menu_v1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_locked</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_masterapp</td><td style="vertical-align:top;">:</td><td><div>mess_menu_v1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_new</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_storage_type</td><td style="vertical-align:top;">:</td><td><div>file</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">status</td><td style="vertical-align:top;">:</td><td><div>200</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">subtitle</td><td style="vertical-align:top;">:</td><td><div>Welcome to Mess Portal</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">title</td><td style="vertical-align:top;">:</td><td><div>Feeling hungry?</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">view</td><td style="vertical-align:top;">:</td><td><div>default/complaint_section.html</div></td></tr></table></div>'
+tRp183
+sS'locals'
+p184
+(dp185
+S'self'
+p186
+S'<Table complaint_register (id,complaint_subject,...e,created_on,created_by,modified_on,modified_by)>'
+p187
+sS'key'
+p188
+S"'complaint_register_isresolved'"
+p189
+sssS'traceback'
+p190
+S'Traceback (most recent call last):\n  File "/home/scorpio/web2py/gluon/restricted.py", line 227, in restricted\n    exec ccode in environment\n  File "/home/scorpio/web2py/applications/mess_menu_v1/controllers/default.py", line 442, in <module>\n  File "/home/scorpio/web2py/gluon/globals.py", line 412, in <lambda>\n    self._caller = lambda f: f()\n  File "/home/scorpio/web2py/gluon/tools.py", line 3774, in f\n    return action(*a, **b)\n  File "/home/scorpio/web2py/applications/mess_menu_v1/controllers/default.py", line 312, in complaint_section\n    db.complaint_register.complaint_register_isresolved.default=False\n  File "/home/scorpio/web2py/gluon/packages/dal/pydal/helpers/classes.py", line 30, in __getattr__\n    raise AttributeError\nAttributeError\n'
+p191
+s.

@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+db=DAL('sqlite://storage.sqlite')
+
+#Defining table for storing notifications
+db.define_table('general_notifications',
+                Field('title'),
+                Field('general_notifications_file','upload'),
+                Field('general_notifications_content','text'))
+
+#Defining table for storing complaints
+db.define_table('complaint_register',
+                Field('complaint_subject'),
+                Field('complaint_register_file','upload'),
+                Field('complaint_register_content','text'),
+                Field('complaint_register_isresolved','boolean'),
+                Field('complaint_tags'),
+                auth.signature)
+
+db.define_table('discussion_forum',
+                Field('discussion_subject'),
+                Field('discussion_content','text'),
+                Field('discussion_file','upload'),
+                Field('discussion_isanswered','boolean'),
+                Field('discussion_tags'),
+                auth.signature)
+
+db.define_table('discussion_comments',
+                Field('comments_id','reference discussion_forum'),
+                Field('comments_file','upload'),
+                Field('comments_isanswered','boolean'),
+                Field('comments_tags'),
+                auth.signature)
+
+db.define_table('reserve_food',
+                Field('reserve_eating_place'),
+                Field('reserve_caterer'),
+                Field('reserve_start_date','datetime'),
+                Field('reserve_end_date','endtime'),
+                Field('reserve_start_meal'),
+                Field('reserve_end_meal'),
+                auth.signature)
+
+db.define_table('cancel_food',
+                Field('cancel_eating_place'),
+                Field('cancel_caterer'),
+                Field('cancel_start_date','datetime'),
+                Field('cancel_end_date','endtime'),
+                Field('cancel_start_meal'),
+                Field('cancel_end_meal'),
+                auth.signature)
+
+db.define_table('account_details',
+                Field('account_initial_balance'),
+                Field('account_curr_balance'),
+                Field('account_st_date','datetime'),
+                Field('account_end_date','datetime'),
+                Field('account_min_balance'),
+                Field('account_balance_to_be_returned'),
+                Field('account_user','reference auth_user'))
+
+db.define_table('last_transactions',
+                Field('transaction_type'),
+                Field('transaction_time'),
+                Field('transaction_eating_place'),
+                Field('transaction_caterer'),
+                Field('transaction_start_date','datetime'),
+                Field('transaction_end_date','endtime'),
+                Field('transaction_start_meal'),
+                Field('transaction_end_meal'),
+                auth.signature)
